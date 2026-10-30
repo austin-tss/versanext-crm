@@ -10,6 +10,7 @@ function ensure(){if(!D.deals)D.deals=[];if(!D.events)D.events=[];if(!D.customer
   add('Southside Builders','email',9,'Confirmed demo time.');add('Peach State Realty','meeting',2,'Signing meeting. Agreement executed.');add('Harbor Cafe','call',16,'Final call. Going in-house for now.');
   const dt=n=>addD(n);D.events.push({id:uid(),type:'demo',title:'Product demo',date:dt(0),time:'14:00',customerId:cust('Acme Logistics')?.id,dealId:1},{id:uid(),type:'meeting',title:'Kickoff with Account Manager',date:dt(1),time:'10:00',customerId:cust('Peach State Realty')?.id,dealId:4},{id:uid(),type:'call',title:'Discovery call',date:dt(2),time:'11:30',customerId:cust('Riverbend Dental')?.id,dealId:2})}
  save()}
+ if(D.demo&&!D.seed2){const h=cust('Harbor Cafe');if(h){const mx=Date.now()-DAY*16;h.log.forEach(l=>{if(l.t>mx)l.t=mx-36e5})}D.seed2=1;save()}
  D.customers.forEach(c=>{c.contacts=c.contacts||[];c.log=c.log||[]});D.deals.forEach(d=>{if(!d.customerId){d.customerId=custFor(d.company,d.contact).id}})}
 function cust(n){n=(n||'').toLowerCase();return D.customers.find(c=>c.name.toLowerCase()==n)}
 const custById=id=>D.customers.find(c=>c.id==id);

@@ -5,4 +5,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: node tests/commission.test.js
+      - run: node tests/commission.test.js && node tests/parser.test.js

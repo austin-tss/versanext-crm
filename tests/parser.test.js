@@ -1,0 +1,10 @@
+const fs=require('fs'),a=require('assert');const h=fs.readFileSync(__dirname+'/../index.html','utf8');
+const src=h.slice(h.indexOf('const WN='),h.indexOf('function parseStage'));const {wordsToNum,parseMoney}=new Function(src+';return{wordsToNum,parseMoney}')();
+const {calc}=require('../calc.js');
+const t='Called Mark at Riverbend Dental, wants pricing, 2000 deposit and 300 a month';
+a.strictEqual(parseMoney(t,'mo'),300);a.strictEqual(parseMoney(t,'dep'),2000);a.strictEqual(calc({deposit:2000,monthly:parseMoney(t,'mo')}).total,960);
+a.strictEqual(parseMoney('they agreed to $300/mo with a $2,000 deposit','mo'),300);a.strictEqual(parseMoney('they agreed to $300/mo with a $2,000 deposit','dep'),2000);
+a.strictEqual(parseMoney('three hundred monthly and a two thousand dollar deposit','mo'),300);a.strictEqual(parseMoney('three hundred monthly and two thousand dollars deposit','dep'),2000);
+a.strictEqual(parseMoney('deposit of 1500, budget around 250','mo'),250);a.strictEqual(parseMoney('deposit of 1500, budget around 250','dep'),1500);
+a.strictEqual(parseMoney('demo Tuesday at 2, 2k upfront','dep'),2000);a.strictEqual(parseMoney('demo Tuesday at 2, 2k upfront','mo'),0);
+console.log('parser tests passed');
