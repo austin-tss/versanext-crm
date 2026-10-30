@@ -34,13 +34,29 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px 6px;b
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:12px 18px;border-radius:8px;border-left:4px solid #1e88ff;display:none;z-index:9;max-width:90%}
 .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.kpi div{background:#fff;border-radius:10px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.06)}.kpi b{display:block;font-size:22px;color:#0b4fb3}@media(max-width:760px){.kpi{grid-template-columns:1fr 1fr}}
 footer{background:#000;color:#9aa6b4;text-align:center;padding:16px;font-size:13px;margin-top:30px}footer b{color:#fff}.hide{display:none}
+.sm{padding:7px 12px;font-size:14px}.bk{color:#1e88ff;cursor:pointer}.chk{display:flex;align-items:center;gap:8px;font-size:14px;margin:12px 0;color:#0d1117}.chk input{width:22px;height:22px}
+.ct{margin-top:6px}.ct td:last-child{text-align:right;font-weight:700}.ct small{display:block;color:#55606e;font-weight:400}.ct .tot td{font-size:18px;color:#0b4fb3;border-top:2px solid #1e88ff}
+.claw{background:#fff7e6;border-left:4px solid #f5a623;padding:10px 12px;border-radius:8px;font-size:14px}.claw small{color:#55606e}
+.calcpage{max-width:720px;margin:0 auto}.calc.big input{font-size:22px;padding:14px}.calc.big .ct td{font-size:17px;padding:12px 6px}.calc.big .ct .tot td{font-size:26px}
+.cc{margin-top:6px;font-weight:700;color:#0b4fb3;font-size:13px}.cc small{color:#55606e;font-weight:400}
+.cust{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid #eef1f5;cursor:pointer}.cust small{display:block;color:#55606e;font-size:12px}.cr{text-align:right}
+.lc{font-size:12px;font-weight:700;padding:4px 8px;border-radius:20px;white-space:nowrap;background:#e8f3ff;color:#0b4fb3;display:inline-block}.lc.amber{background:#fff1d6;color:#b26a00}.lc.red{background:#fde4e4;color:#c62828}
+.lt{font-size:12px;font-weight:700;padding:2px 7px;border-radius:12px;background:#eef1f5}.lt.call{background:#e8f3ff;color:#0b4fb3}.lt.meeting{background:#000;color:#6fd0ff}.lt.email{background:#e9f7ef;color:#1b7f3b}.tl a{color:#1e88ff;cursor:pointer}
+.calbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}.seg{display:flex;background:#e8eef6;border-radius:8px;padding:3px}.seg a{padding:8px 14px;border-radius:6px;cursor:pointer;color:#0b4fb3;font-size:14px}.seg a.on{background:linear-gradient(90deg,#0b4fb3,#1e88ff);color:#fff}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#55606e;margin-bottom:10px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;background:#1e88ff}.dot.t-meeting{background:#000}.dot.t-call{background:#6fd0ff}.dot.t-followup{background:#f5a623}
+.ev{border-left:4px solid #1e88ff;background:#eef6ff;border-radius:6px;padding:6px 8px;margin:4px 0;font-size:13px;cursor:pointer}.ev small{display:block;color:#55606e}.ev.t-meeting{border-color:#000;background:#f0f1f3}.ev.t-call{border-color:#6fd0ff}.ev.t-followup{border-color:#f5a623;background:#fff7e6}
+.slot{display:flex;gap:8px;border-top:1px solid #eef1f5;min-height:48px;padding:4px 0;cursor:pointer}.slot>span{width:56px;flex:none;font-size:12px;color:#55606e;padding-top:4px}.slot>div{flex:1}
+.wd{display:flex;gap:10px;border-top:1px solid #eef1f5;padding:8px 0;min-height:56px;cursor:pointer}.wd.now .wh{background:linear-gradient(135deg,#0b4fb3,#1e88ff);color:#fff}.wh{width:52px;flex:none;text-align:center;border-radius:8px;padding:4px;background:#f4f6f9}.wh b{display:block;font-size:12px}.wh span{font-size:20px;font-weight:700}.we{flex:1;min-width:0}
+.monv{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.mh{font-size:11px;color:#55606e;text-align:center}.md{min-height:58px;background:#f4f6f9;border-radius:6px;padding:4px;font-size:12px;cursor:pointer}.md.oth{opacity:.4}.md.now{outline:2px solid #1e88ff}.md span{display:block;font-weight:700}
+@media(max-width:600px){nav{overflow-x:auto;flex-wrap:nowrap}nav a{white-space:nowrap;padding:12px 10px}.ex{grid-template-columns:1fr}}
 </style></head><body>
 <header><img src=logo.png alt=VNXT><span class=u id=hu></span></header>
-<nav id=nav class=hide><a data-v=voice class=on>🎙 Voice</a><a data-v=today>Today</a><a data-v=pipe>Pipeline</a><a data-v=contacts>Contacts</a><a data-v=companies>Companies</a></nav>
+<nav id=nav class=hide><a data-v=voice class=on>🎙 Voice</a><a data-v=today>Today</a><a data-v=pipe>Pipeline</a><a data-v=customers>Customers</a><a data-v=calendar>Calendar</a><a data-v=calc>Calculator</a></nav>
 <main>
 <div id=login class=card style="max-width:400px;margin:40px auto"><h1>VersaNext CRM</h1><p class=tag>Versatile technology solutions to take your organization to the <b>next level.</b></p><p id=err style="color:#c62828"></p><label>PIN</label><input id=pin type=password inputmode=numeric maxlength=8 autofocus><br><br><button class=btn id=go style="width:100%">Sign in</button></div>
 <div id=app class=hide></div></main>
 <footer><b>VersaNext</b> · A division of Tech Sourced Solutions</footer><div class=toast id=toast></div>
+<script src=calc.js></script>
 <script>
 // ===== Optional LLM hook: set window.VNXT_LLM_ENDPOINT = "https://.../extract" (POST {text} -> JSON {contact,company,stage,value,nextStep,followUp,note}). Falls back to on-device parsing.
 const LLM=()=>window.VNXT_LLM_ENDPOINT||localStorage.vnxt_llm||'';
@@ -58,7 +74,7 @@ function seed(){return{demo:true,deals:[
 {id:5,contact:'Linda Park',company:'Harbor Cafe',stage:'Lost',value:150,deposit:0,nextStep:'Check back next quarter',followUp:addD(60),log:[{t:Date.now()-864e5*9,x:'Went with in-house option.'}]}]}}
 let D=JSON.parse(localStorage.vnxt_crm_data||'null')||seed();const save=()=>localStorage.vnxt_crm_data=JSON.stringify(D);
 const money=n=>'$'+Math.round(n||0).toLocaleString();
-const comm=d=>{const v=+d.value||0,dep=+d.deposit||0;return{bonus:v,dep:dep*.15,res:v*.1*12,total:v+dep*.15+v*1.2}};
+const comm=d=>calc({deposit:d.deposit,monthly:d.value,fees:d.fees,mult:d.mult});
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._);t._=setTimeout(()=>t.style.display='none',3500)}
 function speak(m){try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(m))}catch(e){}}
@@ -107,7 +123,7 @@ ${['contact','company'].map(k=>`<div><label>${k=='contact'?'Contact':'Company'}<
  $('#sv').onclick=()=>{const g=k=>$('#r_'+k).value;let d=D.deals.find(d=>d.company.toLowerCase()==g('company').toLowerCase());const isNew=!d;if(!d){d={id:Date.now(),log:[]};D.deals.push(d)}Object.assign(d,{contact:g('contact')||d.contact,company:g('company')||'Unknown company',stage:g('stage'),value:+g('value')||0,deposit:+g('deposit')||d.deposit||0,nextStep:g('nextStep'),followUp:g('followUp')});d.log.unshift({t:Date.now(),x:g('note')});save();$('#rev').innerHTML='';$('#tx').value='';finalTx='';toast(`✔ ${isNew?'New deal':'Updated'}: ${d.company}`);speak(`Saved. ${d.company}, follow up ${d.followUp}`)}}
 // ===== Views
 function view(v){document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.dataset.v==v));const open=D.deals.filter(d=>!['Won','Lost'].includes(d.stage));
- const banner=D.demo?`<span class=demo>DEMO DATA: sample deals only. <a style="cursor:pointer;text-decoration:underline" onclick="if(confirm('Clear demo data and start fresh?')){D={demo:false,deals:[]};save();view('${v}')}">Clear demo data</a></span>`:'';
+ const banner=D.demo?`<span class=demo>DEMO DATA: sample deals only. <a style="cursor:pointer;text-decoration:underline" onclick="if(confirm('Clear demo data and start fresh?')){D={demo:false,deals:[],customers:[],events:[]};save();view('${v}')}">Clear demo data</a></span>`:'';
  if(v=='voice'){app.innerHTML=banner+`<div class="card voice"><h1>Just talk. VNXT logs it.</h1><p class=tag>Tell it about a call, a meeting, or a next step. The AI fills in the deal for you.</p><div class=micwrap id=mw><div class=ring></div><div class=pulse></div><div class="pulse p2"></div><canvas id=wave width=440 height=440></canvas><button id=mic aria-label="Tap to talk"><svg class=ic-mic viewBox="0 0 24 24" fill="none" stroke="url(#mg)" stroke-width="2" stroke-linecap="round"><defs><linearGradient id=mg x1=0 y1=0 x2=1 y2=1><stop offset=0 stop-color="#6fd0ff"/><stop offset=.5 stop-color="#1e88ff"/><stop offset=1 stop-color="#0b4fb3"/></linearGradient></defs><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"/></svg><svg class=ic-stop viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3" fill="#6fd0ff"/></svg></button></div><p id=ms class=hint>Tap to talk</p>
 <textarea id=tx rows=3 placeholder="Try: “Just met Sarah at Acme, they want a demo next Tuesday, budget around 300 a month”"></textarea><br><br><button class=btn id=pr>✨ Log it</button>
 <p class=hint style="margin-top:14px">Voice commands: “add note to Acme: called, wants pricing” · “move Acme to proposal” · “what's my follow-ups today”</p></div><div id=rev></div>`;$('#mic').onclick=toggleMic;$('#pr').onclick=process;ui()}
@@ -127,5 +143,4 @@ function openDeal(id){const d=D.deals.find(d=>d.id==id),c=comm(d);document.query
  $('#es').onclick=()=>{['stage','contact','nextStep','followUp'].forEach(k=>d[k]=$('#e_'+k).value);d.value=+$('#e_value').value;d.deposit=+$('#e_deposit').value;d.log.unshift({t:Date.now(),x:'Deal updated.'});save();toast('✔ Saved');openDeal(id)};
  $('#ed').onclick=()=>{if(confirm('Delete '+d.company+'?')){D.deals=D.deals.filter(x=>x!==d);save();view('pipe')}};$('#na').onclick=()=>{const v=$('#nn').value.trim();if(v){d.log.unshift({t:Date.now(),x:v});save();openDeal(id)}};scrollTo(0,0)}
 function start(){$('#login').classList.add('hide');app.classList.remove('hide');$('#nav').classList.remove('hide');$('#hu').innerHTML='William Griffin · Sales Rep <a onclick="sessionStorage.removeItem(\'vnxt_crm\');location.reload()">Sign out</a>';view('voice')}
-document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>view(a.dataset.v));if(sessionStorage.vnxt_crm)start();
-</script></body></html>
+</script><script src=crm.js></script><script>document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>view(a.dataset.v));if(sessionStorage.vnxt_crm)start();</script></body></html>
