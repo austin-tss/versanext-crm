@@ -1,0 +1,115 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content=noindex><title>VersaNext CRM</title>
+<style>*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f4f6f9;color:#0d1117}
+header{background:#000;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid;border-image:linear-gradient(90deg,#0b4fb3,#1e88ff,#6fd0ff) 1}
+header img{height:40px}header .u{color:#cfd8e3;font-size:13px}header a{color:#6fd0ff;cursor:pointer;margin-left:12px}
+nav{background:#0a0d12;display:flex;flex-wrap:wrap;padding:0 14px}nav a{color:#cfd8e3;padding:12px 14px;font-size:14px;cursor:pointer}nav a.on,nav a:hover{color:#fff;box-shadow:inset 0 -3px #1e88ff}
+main{max-width:1200px;margin:22px auto;padding:0 16px}.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:18px}
+h1{margin:0 0 4px;font-size:24px}h2{color:#0b4fb3;font-size:17px;margin:0 0 10px}.tag{color:#55606e;margin:0 0 14px}.tag b{color:#1e88ff;font-style:italic}
+.btn{background:linear-gradient(90deg,#0b4fb3,#1e88ff);color:#fff;border:0;border-radius:8px;padding:11px 18px;font-size:15px;cursor:pointer}.btn.g{background:#e8eef6;color:#0b4fb3}
+input,select,textarea{width:100%;padding:10px;border:1px solid #cfd6df;border-radius:8px;font-size:15px;font-family:inherit}
+label{font-size:12px;color:#55606e;font-weight:600;display:block;margin:8px 0 3px}
+.demo{background:#eef6ff;border:1px dashed #1e88ff;color:#0b4fb3;font-size:12px;padding:6px 10px;border-radius:6px;display:inline-block;margin-bottom:10px}
+.voice{text-align:center}#mic{width:150px;height:150px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(135deg,#0b4fb3,#1e88ff,#6fd0ff);color:#fff;font-size:56px;box-shadow:0 8px 30px rgba(30,136,255,.4)}
+#mic.rec{animation:p 1.2s infinite;background:linear-gradient(135deg,#000,#0b4fb3,#1e88ff)}@keyframes p{0%{box-shadow:0 0 0 0 rgba(30,136,255,.6)}100%{box-shadow:0 0 0 30px rgba(30,136,255,0)}}
+#tx{min-height:70px;margin-top:14px;text-align:left}.hint{color:#55606e;font-size:13px}
+.ex{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}@media(max-width:760px){.ex{grid-template-columns:1fr 1fr}}
+.board{display:grid;grid-template-columns:repeat(5,minmax(200px,1fr));gap:12px;overflow-x:auto}.col{background:#e9edf3;border-radius:10px;padding:10px;min-height:200px}.col h3{margin:0 0 8px;font-size:14px;display:flex;justify-content:space-between}
+.deal{background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;border-left:4px solid #1e88ff;cursor:pointer;font-size:13px}.deal b{font-size:14px}.deal .m{color:#0b4fb3;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px 6px;border-bottom:1px solid #eef1f5;text-align:left}th{color:#55606e;font-size:12px}
+.tl{border-left:3px solid #1e88ff;padding-left:12px}.tl div{margin-bottom:10px;font-size:14px}.tl small{color:#55606e}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:12px 18px;border-radius:8px;border-left:4px solid #1e88ff;display:none;z-index:9;max-width:90%}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.kpi div{background:#fff;border-radius:10px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.06)}.kpi b{display:block;font-size:22px;color:#0b4fb3}@media(max-width:760px){.kpi{grid-template-columns:1fr 1fr}}
+footer{background:#000;color:#9aa6b4;text-align:center;padding:16px;font-size:13px;margin-top:30px}footer b{color:#fff}.hide{display:none}
+</style></head><body>
+<header><img src=logo.png alt=VNXT><span class=u id=hu></span></header>
+<nav id=nav class=hide><a data-v=voice class=on>🎙 Voice</a><a data-v=today>Today</a><a data-v=pipe>Pipeline</a><a data-v=contacts>Contacts</a><a data-v=companies>Companies</a></nav>
+<main>
+<div id=login class=card style="max-width:400px;margin:40px auto"><h1>VersaNext CRM</h1><p class=tag>Versatile technology solutions to take your organization to the <b>next level.</b></p><p id=err style="color:#c62828"></p><label>PIN</label><input id=pin type=password inputmode=numeric maxlength=8 autofocus><br><br><button class=btn id=go style="width:100%">Sign in</button></div>
+<div id=app class=hide></div></main>
+<footer><b>VersaNext</b> · A division of Tech Sourced Solutions</footer><div class=toast id=toast></div>
+<script>
+// ===== Optional LLM hook: set window.VNXT_LLM_ENDPOINT = "https://.../extract" (POST {text} -> JSON {contact,company,stage,value,nextStep,followUp,note}). Falls back to on-device parsing.
+const LLM=()=>window.VNXT_LLM_ENDPOINT||localStorage.vnxt_llm||'';
+const PINH='03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
+const $=s=>document.querySelector(s),app=$('#app');
+async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+$('#go').onclick=async()=>{if(await sha($('#pin').value)===PINH){sessionStorage.vnxt_crm=1;start()}else $('#err').textContent='Incorrect PIN.'};$('#pin').onkeydown=e=>e.key=='Enter'&&$('#go').click();
+const STAGES=['Lead','Demo','Proposal','Won','Lost'];
+const iso=d=>d.toISOString().slice(0,10),addD=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+function seed(){return{demo:true,deals:[
+{id:1,contact:'Sarah Lee',company:'Acme Logistics',stage:'Demo',value:300,deposit:2000,nextStep:'Product demo',followUp:addD(0),log:[{t:Date.now()-864e5*3,x:'Intro call. Interested in a custom app.'}]},
+{id:2,contact:'Mark Davis',company:'Riverbend Dental',stage:'Lead',value:250,deposit:1500,nextStep:'Discovery call',followUp:addD(1),log:[{t:Date.now()-864e5,x:'Inbound website lead.'}]},
+{id:3,contact:'Tina Brooks',company:'Southside Builders',stage:'Proposal',value:450,deposit:3000,nextStep:'Send proposal',followUp:addD(0),log:[{t:Date.now()-864e5*5,x:'Demo went well.'}]},
+{id:4,contact:'James Carter',company:'Peach State Realty',stage:'Won',value:350,deposit:2500,nextStep:'Kickoff with Account Manager',followUp:addD(3),log:[{t:Date.now()-864e5*2,x:'Signed agreement.'}]},
+{id:5,contact:'Linda Park',company:'Harbor Cafe',stage:'Lost',value:150,deposit:0,nextStep:'Check back next quarter',followUp:addD(60),log:[{t:Date.now()-864e5*9,x:'Went with in-house option.'}]}]}}
+let D=JSON.parse(localStorage.vnxt_crm_data||'null')||seed();const save=()=>localStorage.vnxt_crm_data=JSON.stringify(D);
+const money=n=>'$'+Math.round(n||0).toLocaleString();
+const comm=d=>{const v=+d.value||0,dep=+d.deposit||0;return{bonus:v,dep:dep*.15,res:v*.1*12,total:v+dep*.15+v*1.2}};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._);t._=setTimeout(()=>t.style.display='none',3500)}
+function speak(m){try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(m))}catch(e){}}
+// ===== On-device extraction
+const NUMW={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,fifteen:15,twenty:20,thirty:30,fifty:50,hundred:100};
+const DAYS=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'],MON=['january','february','march','april','may','june','july','august','september','october','november','december'];
+function parseDate(t){t=t.toLowerCase();const n=new Date();n.setHours(12);
+ if(/\btoday\b|\btonight\b/.test(t))return iso(n);if(/\btomorrow\b/.test(t)){n.setDate(n.getDate()+1);return iso(n)}
+ let m=t.match(/\bin (\d+|a|an|one|two|three|four|five|six|seven|ten) (day|week|month)s?\b/);if(m){const k=+m[1]||NUMW[m[1]]||1;if(m[2]=='day')n.setDate(n.getDate()+k);else if(m[2]=='week')n.setDate(n.getDate()+7*k);else n.setMonth(n.getMonth()+k);return iso(n)}
+ if(/\bnext week\b/.test(t)){n.setDate(n.getDate()+7);return iso(n)}if(/\bnext month\b/.test(t)){n.setMonth(n.getMonth()+1);return iso(n)}
+ m=t.match(new RegExp('\\b(next|this|on)?\\s*('+DAYS.join('|')+')\\b'));if(m){const w=DAYS.indexOf(m[2]);let diff=(w-n.getDay()+7)%7;if(diff==0)diff=7;n.setDate(n.getDate()+diff);return iso(n)}
+ m=t.match(new RegExp('\\b('+MON.join('|')+')\\s+(\\d{1,2})'));if(m){const d=new Date(n.getFullYear(),MON.indexOf(m[1]),+m[2],12);if(d<n)d.setFullYear(d.getFullYear()+1);return iso(d)}
+ m=t.match(/\b(\d{1,2})\/(\d{1,2})\b/);if(m){const d=new Date(n.getFullYear(),m[1]-1,+m[2],12);if(d<n)d.setFullYear(d.getFullYear()+1);return iso(d)}return''}
+function parseMoney(t,kind){const re=/\$?\s?(\d[\d,]*(?:\.\d+)?)\s*(k|thousand|grand)?\b/gi;let m,best=0;while(m=re.exec(t)){let v=parseFloat(m[1].replace(/,/g,''));if(m[2])v*=1000;const pre=t.slice(Math.max(0,m.index-30),m.index).toLowerCase(),post=t.slice(re.lastIndex,re.lastIndex+22).toLowerCase();if(/^\s*\/\s*\d/.test(post)||/^\s*(st|nd|rd|th|am|pm|days?|weeks?|months? (from|out))\b/.test(post))continue;const isMo=/^\s*(dollars\s*)?(a|per|\/|each)\s*mo|^\s*(dollars\s*)?monthly/.test(post)||/(budget|monthly|mrr|month)[^\d]{0,20}$/.test(pre)&&!/deposit[^\d]{0,15}$/.test(pre),isDep=/(deposit|upfront|up front|build fee|setup)[^\d]{0,15}$/.test(pre)||/^\s*(dollars\s*)?(deposit|upfront|up front|down)/.test(post);if(kind=='mo'&&isMo&&!isDep)return v;if(kind=='dep'&&isDep)return v}return best}
+function parseStage(t){t=t.toLowerCase();if(/\b(signed|closed|won|they're in|bought|said yes)\b/.test(t))return'Won';if(/\b(lost|not interested|passed|went with|said no|dead)\b/.test(t))return'Lost';if(/\b(proposal|quote|pricing sent|send (them )?(a )?proposal)\b/.test(t))return'Proposal';if(/\bdemo\b/.test(t))return'Demo';return'Lead'}
+function findCompany(t){for(const d of D.deals){const c=d.company.toLowerCase(),f=c.split(' ')[0];if(t.toLowerCase().includes(c)||new RegExp('\\b'+f+'\\b','i').test(t))return d}return null}
+function parseCompany(t){let m=t.match(/\b(?:at|from|with|over at|for)\s+((?:[A-Z][\w&'.-]*\s?){1,4})/);if(m){let c=m[1].trim().replace(/\s+(They|He|She|We|And|The)$/,'');if(!/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Next|This)/.test(c))return c}return''}
+function parseContact(t){let m=t.match(/\b(?:met|meet|met with|spoke (?:to|with)|talked (?:to|with)|called|call with|emailed|with)\s+([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)/);if(m&&!/^(Acme)$/.test(m[1]))return m[1];m=t.match(/\b([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\s+(?:at|from)\s+[A-Z]/);return m?m[1]:''}
+function parseNext(t){const l=t.toLowerCase();if(/\bdemo\b/.test(l))return'Product demo';if(/proposal|quote/.test(l))return'Send proposal';if(/contract|agreement|sign/.test(l))return'Send agreement';if(/call back|follow up|check in/.test(l))return'Follow-up call';if(/meeting|meet again/.test(l))return'Meeting';let m=t.match(/(?:wants?|need(?:s)? to|next step is|going to)\s+(?:a\s+)?([^.,]{3,40})/i);return m?m[1].trim():'Follow up'}
+function extractLocal(t){const ex=findCompany(t);return{contact:parseContact(t)||(ex?ex.contact:''),company:ex?ex.company:parseCompany(t),stage:parseStage(t),value:parseMoney(t,'mo')||(ex?ex.value:0),deposit:parseMoney(t,'dep'),nextStep:parseNext(t),followUp:parseDate(t)||addD(2),note:t.trim()}}
+async function extract(t){if(LLM()){try{const r=await fetch(LLM(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,stages:STAGES,today:iso(new Date())})});if(r.ok){const j=await r.json();return{...extractLocal(t),...j}}}catch(e){}}return extractLocal(t)}
+// ===== Voice commands
+function command(t){const l=t.toLowerCase().trim();let m;
+ if(/(what'?s?|what are|show|read).*(follow[- ]?ups?|today)/.test(l)||/^follow[- ]?ups?/.test(l)){const f=dueToday();const msg=f.length?`You have ${f.length} follow-ups: `+f.map(d=>`${d.company}, ${d.nextStep}`).join('; '):'No follow-ups due today.';speak(msg);toast(msg);view('today');return true}
+ if(m=l.match(/^(?:move|mark|set|change)\s+(.+?)\s+(?:to|as)\s+(lead|demo|proposal|won|lost|closed won|closed lost)/)){const d=findCompany(m[1]);if(!d){toast('No deal found for '+m[1]);return true}const s=m[2].includes('lost')?'Lost':m[2].includes('won')?'Won':m[2][0].toUpperCase()+m[2].slice(1);d.stage=s;d.log.unshift({t:Date.now(),x:'Stage moved to '+s+' by voice.'});save();speak(`Moved ${d.company} to ${s}`);toast(`✔ ${d.company} → ${s}`);view('pipe');return true}
+ if(m=t.match(/^(?:add (?:a )?note to|note for|log (?:a )?note (?:on|for))\s+([^:,.-]+?)(?:[:,.-]|\s+that\s|\s+saying\s)\s*(.+)$/i)){const d=findCompany(m[1]);if(!d){toast('No deal found for '+m[1]);return true}d.log.unshift({t:Date.now(),x:m[2]});const dt=parseDate(m[2]);if(dt)d.followUp=dt;save();speak('Note added to '+d.company);toast('✔ Note added to '+d.company);openDeal(d.id);return true}
+ return false}
+const dueToday=()=>D.deals.filter(d=>d.followUp&&d.followUp<=iso(new Date())&&!['Won','Lost'].includes(d.stage)||d.followUp==iso(new Date()));
+// ===== Speech
+let rec,recOn=false,finalTx='';
+function initRec(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return null;const r=new SR();r.continuous=true;r.interimResults=true;r.lang='en-US';
+ r.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const s=e.results[i][0].transcript;if(e.results[i].isFinal)finalTx+=s+' ';else interim+=s}$('#tx').value=(finalTx+interim).trim()};
+ r.onend=()=>{if(recOn)try{r.start()}catch(e){}};r.onerror=e=>{if(e.error=='not-allowed'){recOn=false;ui();toast('Microphone blocked. Allow mic access, or type below.')}};return r}
+function ui(){const b=$('#mic');if(b){b.classList.toggle('rec',recOn);b.textContent=recOn?'■':'🎙';$('#ms').textContent=recOn?'Listening… tap to stop and let AI log it':'Tap to talk'}}
+function toggleMic(){rec=rec||initRec();if(!rec){toast('Voice needs Chrome, Edge or Safari. You can type instead.');return}if(recOn){recOn=false;rec.stop();ui();setTimeout(process,400)}else{finalTx=$('#tx').value?$('#tx').value+' ':'';recOn=true;try{rec.start()}catch(e){}ui()}}
+async function process(){const t=$('#tx').value.trim();if(!t)return;if(command(t)){if($('#tx'))$('#tx').value='';finalTx='';return}const x=await extract(t);showReview(x)}
+function showReview(x){$('#rev').innerHTML=`<div class=card><h2>✨ AI captured this. Tap to fix anything, then save</h2><div class=ex>
+${['contact','company'].map(k=>`<div><label>${k=='contact'?'Contact':'Company'}</label><input id=r_${k} value="${esc(x[k])}"></div>`).join('')}
+<div><label>Stage</label><select id=r_stage>${STAGES.map(s=>`<option ${s==x.stage?'selected':''}>${s}</option>`).join('')}</select></div>
+<div><label>Monthly value ($)</label><input id=r_value type=number value="${x.value||''}"></div><div><label>Deposit ($)</label><input id=r_deposit type=number value="${x.deposit||''}"></div>
+<div><label>Follow-up date</label><input id=r_followUp type=date value="${x.followUp}"></div></div><label>Next step</label><input id=r_nextStep value="${esc(x.nextStep)}"><label>Note</label><textarea id=r_note rows=2>${esc(x.note)}</textarea>
+<p class=hint id=r_c></p><button class=btn id=sv>✔ Save to CRM</button> <button class="btn g" onclick="$('#rev').innerHTML=''">Discard</button></div>`;
+ const upd=()=>{const c=comm({value:$('#r_value').value,deposit:$('#r_deposit').value});$('#r_c').innerHTML=`Your commission on this deal: <b style="color:#0b4fb3">${money(c.total)}</b> (signing bonus ${money(c.bonus)} + deposit ${money(c.dep)} + 12-mo residual ${money(c.res)})`};upd();$('#r_value').oninput=$('#r_deposit').oninput=upd;
+ $('#sv').onclick=()=>{const g=k=>$('#r_'+k).value;let d=D.deals.find(d=>d.company.toLowerCase()==g('company').toLowerCase());const isNew=!d;if(!d){d={id:Date.now(),log:[]};D.deals.push(d)}Object.assign(d,{contact:g('contact')||d.contact,company:g('company')||'Unknown company',stage:g('stage'),value:+g('value')||0,deposit:+g('deposit')||d.deposit||0,nextStep:g('nextStep'),followUp:g('followUp')});d.log.unshift({t:Date.now(),x:g('note')});save();$('#rev').innerHTML='';$('#tx').value='';finalTx='';toast(`✔ ${isNew?'New deal':'Updated'}: ${d.company}`);speak(`Saved. ${d.company}, follow up ${d.followUp}`)}}
+// ===== Views
+function view(v){document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.dataset.v==v));const open=D.deals.filter(d=>!['Won','Lost'].includes(d.stage));
+ const banner=D.demo?`<span class=demo>DEMO DATA: sample deals only. <a style="cursor:pointer;text-decoration:underline" onclick="if(confirm('Clear demo data and start fresh?')){D={demo:false,deals:[]};save();view('${v}')}">Clear demo data</a></span>`:'';
+ if(v=='voice'){app.innerHTML=banner+`<div class="card voice"><h1>Just talk. VNXT logs it.</h1><p class=tag>Tell it about a call, a meeting, or a next step. The AI fills in the deal for you.</p><button id=mic>🎙</button><p id=ms class=hint>Tap to talk</p>
+<textarea id=tx rows=3 placeholder="Try: “Just met Sarah at Acme, they want a demo next Tuesday, budget around 300 a month”"></textarea><br><br><button class=btn id=pr>✨ Log it</button>
+<p class=hint style="margin-top:14px">Voice commands: “add note to Acme: called, wants pricing” · “move Acme to proposal” · “what's my follow-ups today”</p></div><div id=rev></div>`;$('#mic').onclick=toggleMic;$('#pr').onclick=process;ui()}
+ if(v=='today'){const f=dueToday().sort((a,b)=>a.followUp<b.followUp?-1:1);const pipe=open.reduce((s,d)=>s+comm(d).total,0);
+  app.innerHTML=banner+`<div class=kpi><div>Follow-ups due<b>${f.length}</b></div><div>Open deals<b>${open.length}</b></div><div>Open monthly value<b>${money(open.reduce((s,d)=>s+ +d.value,0))}</b></div><div>Potential commission<b>${money(pipe)}</b></div></div><br><div class=card><h2>Today's follow-ups</h2>${f.length?`<table><tr><th>Due</th><th>Company</th><th>Contact</th><th>Next step</th><th>Stage</th></tr>${f.map(d=>`<tr style="cursor:pointer" onclick="openDeal(${d.id})"><td>${d.followUp<iso(new Date())?'<b style=color:#c62828>Overdue</b>':'Today'}</td><td><b>${esc(d.company)}</b></td><td>${esc(d.contact)}</td><td>${esc(d.nextStep)}</td><td>${d.stage}</td></tr>`).join('')}</table>`:'<p class=hint>All caught up.</p>'}</div>`}
+ if(v=='pipe'){app.innerHTML=banner+`<div class=board>${STAGES.map(s=>{const ds=D.deals.filter(d=>d.stage==s);return`<div class=col ondragover="event.preventDefault()" ondrop="drop(event,'${s}')"><h3>${s}<span>${money(ds.reduce((a,d)=>a+ +d.value,0))}/mo</span></h3>${ds.map(d=>`<div class=deal draggable=true ondragstart="event.dataTransfer.setData('id',${d.id})" onclick="openDeal(${d.id})"><b>${esc(d.company)}</b><br>${esc(d.contact)}<br><span class=m>${money(d.value)}/mo</span> · ${esc(d.nextStep)}<br><small>Follow-up ${d.followUp}</small></div>`).join('')}</div>`}).join('')}</div><p class=hint>Drag cards between stages, or say “move Acme to proposal”.</p>`}
+ if(v=='contacts')app.innerHTML=banner+`<div class=card><h2>Contacts</h2><table><tr><th>Name</th><th>Company</th><th>Stage</th><th>Last activity</th></tr>${D.deals.map(d=>`<tr style=cursor:pointer onclick="openDeal(${d.id})"><td><b>${esc(d.contact)}</b></td><td>${esc(d.company)}</td><td>${d.stage}</td><td>${d.log[0]?new Date(d.log[0].t).toLocaleDateString():''}</td></tr>`).join('')}</table></div>`;
+ if(v=='companies'){const cs={};D.deals.forEach(d=>(cs[d.company]=cs[d.company]||[]).push(d));app.innerHTML=banner+`<div class=card><h2>Companies</h2><table><tr><th>Company</th><th>Deals</th><th>Monthly value</th><th>Your commission</th></tr>${Object.entries(cs).map(([c,ds])=>`<tr style=cursor:pointer onclick="openDeal(${ds[0].id})"><td><b>${esc(c)}</b></td><td>${ds.length}</td><td>${money(ds.reduce((a,d)=>a+ +d.value,0))}/mo</td><td>${money(ds.reduce((a,d)=>a+comm(d).total,0))}</td></tr>`).join('')}</table></div>`}
+ scrollTo(0,0)}
+function drop(e,s){const d=D.deals.find(d=>d.id==e.dataTransfer.getData('id'));if(d&&d.stage!=s){d.stage=s;d.log.unshift({t:Date.now(),x:'Stage moved to '+s});save();view('pipe')}}
+function openDeal(id){const d=D.deals.find(d=>d.id==id),c=comm(d);document.querySelectorAll('nav a').forEach(a=>a.classList.remove('on'));
+ app.innerHTML=`<p><a style="color:#1e88ff;cursor:pointer" onclick="view('pipe')">← Pipeline</a></p><div class=card><h1>${esc(d.company)}</h1><p class=tag>${esc(d.contact)} · ${d.stage}</p><div class=ex>
+<div><label>Stage</label><select id=e_stage>${STAGES.map(s=>`<option ${s==d.stage?'selected':''}>${s}</option>`).join('')}</select></div><div><label>Monthly value</label><input id=e_value type=number value=${d.value}></div><div><label>Deposit</label><input id=e_deposit type=number value=${d.deposit||0}></div>
+<div><label>Contact</label><input id=e_contact value="${esc(d.contact)}"></div><div><label>Next step</label><input id=e_nextStep value="${esc(d.nextStep)}"></div><div><label>Follow-up</label><input id=e_followUp type=date value=${d.followUp}></div></div><br><button class=btn id=es>Save</button> <button class="btn g" id=ed>Delete deal</button></div>
+<div class=card><h2>Your commission on this deal</h2><table><tr><td>Signing bonus (100% of first month)</td><td style=text-align:right><b>${money(c.bonus)}</b></td></tr><tr><td>Deposit commission (15%)</td><td style=text-align:right><b>${money(c.dep)}</b></td></tr><tr><td>Residual (10% monthly × 12 months)</td><td style=text-align:right><b>${money(c.res)}</b></td></tr><tr><td><b>Total</b></td><td style="text-align:right;color:#0b4fb3;font-size:18px"><b>${money(c.total)}</b></td></tr></table><p class=hint>${d.stage=='Won'?'Earned once the client pays.':'Potential, if this deal closes.'}</p></div>
+<div class=card><h2>Activity</h2><div style="display:flex;gap:8px;margin-bottom:12px"><input id=nn placeholder="Add a note…"><button class=btn id=na>Add</button></div><div class=tl>${d.log.map(l=>`<div>${esc(l.x)}<br><small>${new Date(l.t).toLocaleString()}</small></div>`).join('')}</div></div>`;
+ $('#es').onclick=()=>{['stage','contact','nextStep','followUp'].forEach(k=>d[k]=$('#e_'+k).value);d.value=+$('#e_value').value;d.deposit=+$('#e_deposit').value;d.log.unshift({t:Date.now(),x:'Deal updated.'});save();toast('✔ Saved');openDeal(id)};
+ $('#ed').onclick=()=>{if(confirm('Delete '+d.company+'?')){D.deals=D.deals.filter(x=>x!==d);save();view('pipe')}};$('#na').onclick=()=>{const v=$('#nn').value.trim();if(v){d.log.unshift({t:Date.now(),x:v});save();openDeal(id)}};scrollTo(0,0)}
+function start(){$('#login').classList.add('hide');app.classList.remove('hide');$('#nav').classList.remove('hide');$('#hu').innerHTML='William Griffin · Sales Rep <a onclick="sessionStorage.removeItem(\'vnxt_crm\');location.reload()">Sign out</a>';view('voice')}
+document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>view(a.dataset.v));if(sessionStorage.vnxt_crm)start();
+</script></body></html>
