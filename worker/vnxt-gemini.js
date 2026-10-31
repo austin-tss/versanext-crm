@@ -1,7 +1,7 @@
 // vnxt-gemini: Gemini proxy for VersaNext CRM voice. Key lives only in env.GEMINI_API_KEY (Worker secret).
 const ORIGIN = 'https://austin-tss.github.io';
 const MODEL = 'gemini-flash-latest';
-const LIMIT = 30, WINDOW = 60000; // 30 requests / minute / IP (per isolate)
+const LIMIT = 30, WINDOW = 60000; // 30 requests / minute / IP: Workers Rate Limiting binding RL, in-memory fallback
 const hits = new Map();
 function cors(o) { return { 'Access-Control-Allow-Origin': ORIGIN, 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '86400', 'Vary': 'Origin', ...(o || {}) }; }
 function json(obj, status) { return new Response(JSON.stringify(obj), { status: status || 200, headers: cors({ 'Content-Type': 'application/json' }) }); }
@@ -27,7 +27,7 @@ export default {
     if (req.method !== 'POST') return json({ error: 'method' }, 405);
     if (origin !== ORIGIN) return json({ error: 'origin not allowed' }, 403);
     const ip = req.headers.get('CF-Connecting-IP') || 'x';
-    if (limited(ip)) return json({ error: 'rate limited' }, 429);
+    if (env.RL) { const r = await env.RL.limit({ key: ip }); if (!r.success) return json({ error: 'rate limited' }, 429); } else if (limited(ip)) return json({ error: 'rate limited' }, 429);
     const raw = await req.text(); if (raw.length > 30000) return json({ error: 'too large' }, 413);
     let b; try { b = JSON.parse(raw); } catch (e) { return json({ error: 'bad json' }, 400); }
     const t = clip(b.transcript, 1500).trim(); if (!t) return json({ error: 'no transcript' }, 400);
