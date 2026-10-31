@@ -11,3 +11,4 @@ console.log('parser tests passed');
 const ps=new Function(h.slice(h.indexOf('function parseStage'),h.indexOf('function findCompany'))+';return parseStage')();
 a.strictEqual(ps('new prospect, Metro Fitness, add as a target'),'Target');a.strictEqual(ps('inbound lead from website'),'Lead');a.strictEqual(ps('they want a demo'),'Demo');
 console.log('stage tests passed (Target)');
+a.strictEqual(parseMoney('two grand down and three fifty monthly','mo'),350);a.strictEqual(parseMoney('two grand down and three fifty monthly','dep'),2000);console.log('colloquial ok');
