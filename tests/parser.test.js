@@ -8,3 +8,6 @@ a.strictEqual(parseMoney('three hundred monthly and a two thousand dollar deposi
 a.strictEqual(parseMoney('deposit of 1500, budget around 250','mo'),250);a.strictEqual(parseMoney('deposit of 1500, budget around 250','dep'),1500);
 a.strictEqual(parseMoney('demo Tuesday at 2, 2k upfront','dep'),2000);a.strictEqual(parseMoney('demo Tuesday at 2, 2k upfront','mo'),0);
 console.log('parser tests passed');
+const ps=new Function(h.slice(h.indexOf('function parseStage'),h.indexOf('function findCompany'))+';return parseStage')();
+a.strictEqual(ps('new prospect, Metro Fitness, add as a target'),'Target');a.strictEqual(ps('inbound lead from website'),'Lead');a.strictEqual(ps('they want a demo'),'Demo');
+console.log('stage tests passed (Target)');
