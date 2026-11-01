@@ -5,4 +5,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: for f in *.js; do node --check $f; done && node tests/commission.test.js && node tests/parser.test.js
+      - run: for f in *.js; do node --check $f; done && node tests/commission.test.js && node tests/parser.test.js && node tests/owner.test.js
