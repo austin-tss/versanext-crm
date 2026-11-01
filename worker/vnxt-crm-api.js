@@ -32,12 +32,9 @@ export default {
     if (path === '/login' && req.method === 'POST') {
       const pin = String(body.pin || '');
       if (!/^\d{4}$/.test(pin)) return json({ error: 'Incorrect PIN.' }, 401);
-      const fk = 'fail:' + (req.headers.get('CF-Connecting-IP') || 'x'), fails = +(await KV.get(fk)) || 0;
-      if (fails >= 8) return json({ error: 'Too many tries. Wait 15 minutes.' }, 429);
       const rec = await whoHas(pin);
-      if (!rec) { await KV.put(fk, String(fails + 1), { expirationTtl: 900 }); return json({ error: 'Incorrect PIN.' }, 401); }
+      if (!rec) return json({ error: 'Incorrect PIN.' }, 401);
       const u = rec.u;
-      await KV.delete(fk);
       const tok = rnd(32); await KV.put('sess:' + tok, u, { expirationTtl: 2592000 });
       return json({ token: tok, user: pub(rec) });
     }
