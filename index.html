@@ -90,7 +90,7 @@ body.dark input,body.dark select,body.dark textarea{background:#05080d;color:#ff
 .pvmodal{display:block;margin:4px 0 12px}.pvmodal .pvtip{left:50%;transform:translateX(-50%);text-align:left}.vm select,.vm textarea,.vm input{background:#05080d;color:#fff;border-color:#1d3557}.lostr{background:#2a0f12;color:#ffb3b3;padding:8px 12px;border-radius:8px;font-size:14px}
 </style></head><body>
 <header><img src=logo.png alt=VNXT><span class=u id=hu></span></header>
-<nav id=nav class=hide><a data-v=voice class=on>🎙 Voice</a><a data-v=today>Today</a><a data-v=pipe>Pipeline</a><a data-v=targets>Targets</a><a data-v=customers>My Customers</a><a data-v=calendar>Calendar</a><a data-v=mycomm>My Commission</a><a data-v=expenses>Expenses</a></nav>
+<nav id=nav class=hide><a data-v=voice class=on>🎙 Voice</a><a data-v=today>Today</a><a data-v=pipe>Pipeline</a><a data-v=targets>Targets</a><a data-v=customers>My Customers</a><a data-v=calendar>Calendar</a><a data-v=mycomm>My Commission</a><a data-v=expenses>Expenses</a><a data-v=docs>Documents</a></nav>
 <main>
 <div id=login><img src=logo-dark.png alt=VNXT class=lglogo><p class=lgdiv>A division of Tech Sourced Solutions</p><p class=lgh>Enter your PIN</p>
 <div class=dots id=dots><i></i><i></i><i></i><i></i></div><p id=err class=lgerr></p>
@@ -195,4 +195,4 @@ function openDeal(id){const d=D.deals.find(d=>d.id==id),c=comm(d);document.query
  $('#es').onclick=()=>{['stage','contact','nextStep','followUp'].forEach(k=>d[k]=$('#e_'+k).value);d.value=+$('#e_value').value;d.deposit=+$('#e_deposit').value;d.log.unshift({t:Date.now(),x:'Deal updated.'});save();toast('✔ Saved');openDeal(id)};
  $('#ed').onclick=()=>{if(confirm('Delete '+d.company+'?')){D.deals=D.deals.filter(x=>x!==d);save();view('pipe')}};$('#na').onclick=()=>{const v=$('#nn').value.trim();if(v){d.log.unshift({t:Date.now(),x:v});save();openDeal(id)}};scrollTo(0,0)}
 function start(){$('#login').classList.add('hide');app.classList.remove('hide');$('#nav').classList.remove('hide');$('#hu').innerHTML='Austin Stinson · Sales Rep <a onclick="sessionStorage.removeItem(\'vnxt_crm\');location.reload()">Sign out</a>';view('voice')}
-</script><script src=crm.js?v=10></script><script src=expenses.js?v=10></script><script src=mycomm.js?v=10></script><script src=onevoice.js?v=10></script><script>document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>view(a.dataset.v));if(sessionStorage.vnxt_crm)start();</script></body></html>
+</script><script src=crm.js?v=10></script><script src=expenses.js?v=10></script><script src=mycomm.js?v=10></script><script src=onevoice.js?v=10></script><script src=docs.js?v=11></script><script>document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>view(a.dataset.v));if(sessionStorage.vnxt_crm)start();</script></body></html>
