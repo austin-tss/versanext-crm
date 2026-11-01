@@ -88,16 +88,16 @@ body.dark input,body.dark select,body.dark textarea{background:#05080d;color:#ff
 .pvb.muted{background:#2a2f38;box-shadow:0 0 0 2px #55606e;position:relative}.pvb.muted svg{opacity:.5}.pvb.muted::after{content:'';position:absolute;left:12px;top:50%;width:22px;height:2px;background:#ff6b6b;transform:rotate(-45deg)}.pvtx{margin-bottom:8px;color:#fff}.pvctl{display:flex;gap:8px}
 .pvhead{margin:0 0 12px;font-size:20px;color:#0d1117}body.dark .pvhead{color:#fff}
 .pvmodal{display:block;margin:4px 0 12px}.pvmodal .pvtip{left:50%;transform:translateX(-50%);text-align:left}.vm select,.vm textarea,.vm input{background:#05080d;color:#fff;border-color:#1d3557}.lostr{background:#2a0f12;color:#ffb3b3;padding:8px 12px;border-radius:8px;font-size:14px}
-.lgu{display:block;margin:0 auto 14px;width:220px;background:#000;border:1px solid #1e88ff;color:#fff;border-radius:12px;padding:12px 14px;font-size:16px;text-align:center}.lgu:focus{outline:2px solid #6fd0ff}</style></head><body>
+</style></head><body>
 <header><img src=logo.png alt=VNXT><span class=u id=hu></span></header>
 <nav id=nav class=hide><a data-v=voice class=on>🎙 Voice</a><a data-v=today>Today</a><a data-v=pipe>Pipeline</a><a data-v=targets>Targets</a><a data-v=customers>My Customers</a><a data-v=calendar>Calendar</a><a data-v=mycomm>My Commission</a><a data-v=expenses>Expenses</a><a data-v=docs>Documents</a></nav>
 <main>
-<div id=login><img src=logo-dark.png alt=VNXT class=lglogo><p class=lgdiv>A division of Tech Sourced Solutions</p><input id=lgu class=lgu placeholder=Username autocomplete=username autocapitalize=none spellcheck=false><p class=lgh>Enter your PIN</p>
+<div id=login><img src=logo-dark.png alt=VNXT class=lglogo><p class=lgdiv>A division of Tech Sourced Solutions</p><p class=lgh>Enter your PIN</p>
 <div class=dots id=dots><i></i><i></i><i></i><i></i></div><p id=err class=lgerr></p>
 <div class=pad id=pad><button data-k=1>1</button><button data-k=2>2</button><button data-k=3>3</button><button data-k=4>4</button><button data-k=5>5</button><button data-k=6>6</button><button data-k=7>7</button><button data-k=8>8</button><button data-k=9>9</button><button data-k=back aria-label=Backspace>⌫</button><button data-k=0>0</button><button data-k=clear aria-label=Clear>C</button></div></div>
 <div id=app class=hide></div></main>
 <footer><b>VersaNext</b> · A division of Tech Sourced Solutions</footer><div class=toast id=toast></div>
-<script src=calc.js?v=13></script><script src=owner.js?v=13></script>
+<script src=calc.js?v=15></script><script src=owner.js?v=15></script>
 <script>
 // ===== Optional LLM hook: set window.VNXT_LLM_ENDPOINT = "https://.../extract" (POST {text} -> JSON {contact,company,stage,value,nextStep,followUp,note}). Falls back to on-device parsing.
 const LLM=()=>window.VNXT_LLM_ENDPOINT||localStorage.vnxt_llm||'';
@@ -112,12 +112,12 @@ const $=s=>document.querySelector(s),app=$('#app');
 async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 let pinV='',pinBusy=false;const dotsUI=()=>document.querySelectorAll('#dots i').forEach((d,i)=>d.classList.toggle('on',i<pinV.length));
 async function pinKey(k){if(pinBusy||!$('#login')||$('#login').classList.contains('hide'))return;$('#err').textContent='';if(k=='back')pinV=pinV.slice(0,-1);else if(k=='clear')pinV='';else if(/^\d$/.test(k)&&pinV.length<4)pinV+=k;dotsUI();
- if(pinV.length==4){pinBusy=true;const u=$('#lgu').value.trim().toLowerCase();let res=null,msg='Incorrect username or PIN.';try{res=await api('/login',{method:'POST',body:{u,pin:pinV}})}catch(e){msg=e&&e.message||'Cannot reach server.'}
-  if(res){sessionStorage.vnxt_tok=res.token;sessionStorage.vnxt_me=JSON.stringify(res.user);localStorage.vnxt_lastu=u;try{await loadData();sessionStorage.vnxt_crm=1;document.body.classList.remove('lgmode');start()}catch(e){msg='Cannot load data.';res=null}}
+ if(pinV.length==4){pinBusy=true;let res=null,msg='Incorrect PIN. Try again.';try{res=await api('/login',{method:'POST',body:{pin:pinV}})}catch(e){msg=e&&e.message||'Cannot reach server.'}
+  if(res){sessionStorage.vnxt_tok=res.token;sessionStorage.vnxt_me=JSON.stringify(res.user);try{await loadData();sessionStorage.vnxt_crm=1;document.body.classList.remove('lgmode');start()}catch(e){msg='Cannot load data.';res=null}}
   if(!res){const l=$('#login');l.classList.remove('shake');void l.offsetWidth;l.classList.add('shake');$('#err').textContent=msg;navigator.vibrate&&navigator.vibrate(120)}pinV='';dotsUI();pinBusy=false}}
 function flash(k){const b=document.querySelector(`#pad [data-k="${k}"]`);if(b){b.classList.remove('hit');void b.offsetWidth;b.classList.add('hit')}}
 document.querySelectorAll('#pad button').forEach(b=>b.onclick=()=>{flash(b.dataset.k);pinKey(b.dataset.k)});
-document.addEventListener('keydown',e=>{if($('#login').classList.contains('hide')||document.activeElement==$('#lgu'))return;let k=/^\d$/.test(e.key)?e.key:e.key=='Backspace'?'back':e.key=='Escape'||e.key=='Delete'?'clear':null;if(k){e.preventDefault();flash(k);pinKey(k)}});
+document.addEventListener('keydown',e=>{if($('#login').classList.contains('hide'))return;let k=/^\d$/.test(e.key)?e.key:e.key=='Backspace'?'back':e.key=='Escape'||e.key=='Delete'?'clear':null;if(k){e.preventDefault();flash(k);pinKey(k)}});
 if(!sessionStorage.vnxt_crm)document.body.classList.add('lgmode');
 const STAGES=['Target','Lead','Demo','Proposal','Won','Lost'];
 const iso=d=>d.toISOString().slice(0,10),addD=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
@@ -203,4 +203,4 @@ function openDeal(id){const d=D.deals.find(d=>d.id==id),c=comm(d);document.query
  $('#es').onclick=()=>{['stage','contact','nextStep','followUp'].forEach(k=>d[k]=$('#e_'+k).value);d.value=+$('#e_value').value;d.deposit=+$('#e_deposit').value;d.log.unshift({t:Date.now(),x:'Deal updated.'});save();toast('✔ Saved');openDeal(id)};
  $('#ed').onclick=()=>{if(confirm('Delete '+d.company+'?')){D.deals=D.deals.filter(x=>x!==d);save();view('pipe')}};$('#na').onclick=()=>{const v=$('#nn').value.trim();if(v){d.log.unshift({t:Date.now(),x:v});save();openDeal(id)}};scrollTo(0,0)}
 function start(){$('#login').classList.add('hide');app.classList.remove('hide');$('#nav').classList.remove('hide');teamNav();$('#hu').innerHTML=esc(ME.name)+' · '+esc(ME.title)+' <a onclick="signOut()">Sign out</a>';view('voice')}
-</script><script src=crm.js?v=13></script><script src=expenses.js?v=13></script><script src=mycomm.js?v=13></script><script src=onevoice.js?v=13></script><script src=docs.js?v=13></script><script src=team.js?v=14></script><script>document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>view(a.dataset.v));$('#lgu').value=localStorage.vnxt_lastu||'';if(sessionStorage.vnxt_crm&&sessionStorage.vnxt_tok)loadData().then(start).catch(()=>{});else{sessionStorage.removeItem('vnxt_crm');document.body.classList.add('lgmode')}</script></body></html>
+</script><script src=crm.js?v=15></script><script src=expenses.js?v=15></script><script src=mycomm.js?v=15></script><script src=onevoice.js?v=15></script><script src=docs.js?v=15></script><script src=team.js?v=15></script><script>document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>view(a.dataset.v));if(sessionStorage.vnxt_crm&&sessionStorage.vnxt_tok)loadData().then(start).catch(()=>{});else{sessionStorage.removeItem('vnxt_crm');document.body.classList.add('lgmode')}</script></body></html>

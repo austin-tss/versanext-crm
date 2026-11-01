@@ -25,16 +25,18 @@ export default {
     const KV = env.KV;
     const users = async () => (await KV.get('users', 'json')) || [];
     const getU = u => KV.get('user:' + u, 'json');
+    const whoHas = async pin => { for (const u of await users()) { const r = await getU(u); if (r && r.active !== false && eq(await pinHash(pin, r.salt), r.hash)) return r; } return null; };
+    const uniquePin = async () => { for (let i = 0; i < 50; i++) { const p = newPin(); if (!(await whoHas(p))) return p; } throw new Error('no free PIN'); };
     let body = {};
     if (req.method === 'POST' || req.method === 'PUT') { const raw = await req.text(); if (raw.length > 2e6) return json({ error: 'too large' }, 413); try { body = raw ? JSON.parse(raw) : {}; } catch (e) { return json({ error: 'bad json' }, 400); } }
     if (path === '/login' && req.method === 'POST') {
-      const u = String(body.u || '').toLowerCase().trim().slice(0, 40), pin = String(body.pin || '');
-      if (!/^\d{4}$/.test(pin) || !u) return json({ error: 'Incorrect username or PIN.' }, 401);
-      const fk = 'fail:' + u, fails = +(await KV.get(fk)) || 0;
-      if (fails >= 5) return json({ error: 'Too many tries. Wait 15 minutes.' }, 429);
-      const rec = await getU(u);
-      const ok = rec && rec.active !== false && eq(await pinHash(pin, rec.salt), rec.hash);
-      if (!ok) { await KV.put(fk, String(fails + 1), { expirationTtl: 900 }); return json({ error: 'Incorrect username or PIN.' }, 401); }
+      const pin = String(body.pin || '');
+      if (!/^\d{4}$/.test(pin)) return json({ error: 'Incorrect PIN.' }, 401);
+      const fk = 'fail:' + (req.headers.get('CF-Connecting-IP') || 'x'), fails = +(await KV.get(fk)) || 0;
+      if (fails >= 8) return json({ error: 'Too many tries. Wait 15 minutes.' }, 429);
+      const rec = await whoHas(pin);
+      if (!rec) { await KV.put(fk, String(fails + 1), { expirationTtl: 900 }); return json({ error: 'Incorrect PIN.' }, 401); }
+      const u = rec.u;
       await KV.delete(fk);
       const tok = rnd(32); await KV.put('sess:' + tok, u, { expirationTtl: 2592000 });
       return json({ token: tok, user: pub(rec) });
@@ -69,7 +71,7 @@ export default {
         const u = String(body.u || '').toLowerCase().trim(), name = String(body.name || '').trim().slice(0, 60);
         if (!/^[a-z][a-z0-9._-]{1,30}$/.test(u) || !name) return json({ error: 'Username (letters/numbers) and name required.' }, 400);
         if (await getU(u)) return json({ error: 'That username is taken.' }, 409);
-        const pin = newPin(), salt = rnd(16);
+        const pin = await uniquePin(), salt = rnd(16);
         await KV.put('user:' + u, JSON.stringify({ u, name, role: 'rep', title: 'Account Manager', salt, hash: await pinHash(pin, salt), active: true }));
         await KV.put('users', JSON.stringify([...list, u]));
         return json({ user: { u, name, role: 'rep', title: 'Account Manager' }, pin });
@@ -77,8 +79,8 @@ export default {
       if (path === '/team/reset' && req.method === 'POST') {
         const rec = await getU(String(body.u || '')); if (!rec) return json({ error: 'No such user.' }, 404);
         if (rec.role === 'admin') return json({ error: 'Admin PIN is not reset here.' }, 400);
-        const pin = newPin(); rec.salt = rnd(16); rec.hash = await pinHash(pin, rec.salt);
-        await KV.put('user:' + rec.u, JSON.stringify(rec)); await KV.delete('fail:' + rec.u);
+        const pin = await uniquePin(); rec.salt = rnd(16); rec.hash = await pinHash(pin, rec.salt);
+        await KV.put('user:' + rec.u, JSON.stringify(rec)); 
         return json({ user: pub(rec), pin });
       }
     }
